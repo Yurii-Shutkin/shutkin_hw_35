@@ -53,20 +53,19 @@
             const currentItem = data.find(todoItem => todoItem.itemId === +itemId);
             currentItem.completed = status;
             localStorage.setItem(this.formId, JSON.stringify(data));
-            
-            console.log(currentItem);
-            console.log(currentItem.itemId);
-            console.log(data);
         },
 
         removeTodoItem({target}) {
             if(!target.classList.contains('delete-item-btn')) return;
-            const itemId = target.getAttribute('data-id');
             const data = JSON.parse(localStorage.getItem(this.formId));
-            const currentItemId = data.find(todoItem => todoItem.itemId === +itemId);
-            data.splice(currentItemId, 1);
+            const itemId = +target.getAttribute('data-id');
+            // console.log(itemId);
+            const currentItemId = data.find(todoItem => todoItem.itemId === itemId);
+            // console.log(data);
+            const removeItems = data.splice(currentItemId, 1);
+            // console.log(removeItems);
+            // console.log(currentItemId);
             localStorage.setItem(this.formId, JSON.stringify(data));
-            console.log(itemId);
             const todoItemContainer = this.findParentElByClass(target, 'taskWrapper');
             todoItemContainer.parentElement.remove();
         },
@@ -89,7 +88,7 @@
         },
 
         getInputs({target}) {
-            return target.querySelectorAll('input:not([type="submit"]), textarea');
+            return target.querySelectorAll('input:not([type="submit"], [type="reset"]), textarea');
         },
 
         setDataValues(data) {
@@ -113,9 +112,9 @@
             return this.todoItemContainer = document.getElementById('todoItems');
         },
 
-        createTemplate({title, description}) {
-            const taskWrapper = this.createElement('div', 'taskWrapper');
+        createTemplate({title, description, itemId, completed}) {
             const todoItem = this.createElement('div', 'col-4');
+            const taskWrapper = this.createElement('div', 'taskWrapper');
             const taskHeading = this.createElement('div', 'taskHeading', title);
             const taskDescription = this.createElement('div', 'taskDescription', description);
             const checkboxLabel = this.createElement('label');
@@ -124,12 +123,12 @@
             const deleteTaskBtn = this.createElement('button', ['btn', 'btn-danger', 'delete-item-btn']);
             
             todoItem.append(taskWrapper);
-            checkbox.setAttribute('data-id', this.todoItemId);
+            checkbox.setAttribute('data-id', itemId);
             checkbox.setAttribute('type', 'checkbox');
             span.innerHTML = 'Completed ?';
             checkboxLabel.append(checkbox);
             checkboxLabel.append(span);
-            deleteTaskBtn.setAttribute('data-id', this.todoItemId);
+            deleteTaskBtn.setAttribute('data-id', itemId);
             deleteTaskBtn.innerHTML += 'Delete'
             
             taskWrapper.append(taskHeading);
@@ -138,6 +137,8 @@
             taskWrapper.append(checkboxLabel);
             taskWrapper.innerHTML += '<hr>';
             taskWrapper.append(deleteTaskBtn);
+
+            todoItem.querySelector('input[type=checkbox]').checked = completed;
             
             return todoItem;
         },
@@ -180,7 +181,6 @@
             const data = this.getData(this.formId);
             if(!data || !data.length) return;
             this.todoItemId = data[data.length - 1].itemId;
-            console.log(this.getData(this.formId));
             data.forEach(itemData => this.getTodoItemContainer().prepend(this.createTemplate(itemData)));
         },
 
