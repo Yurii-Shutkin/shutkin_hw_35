@@ -42,8 +42,6 @@
                 this.getTodoItemContainer().prepend(this.createTemplate(this.todoData));
             }
             event.target.reset();
-            console.log(this.todoItemContainer)
-            console.log(this.todoData)
         },
 
         isChecked({target}) {
@@ -59,12 +57,8 @@
             if(!target.classList.contains('delete-item-btn')) return;
             const data = JSON.parse(localStorage.getItem(this.formId));
             const itemId = +target.getAttribute('data-id');
-            // console.log(itemId);
-            const currentItemId = data.find(todoItem => todoItem.itemId === itemId);
-            // console.log(data);
-            const removeItems = data.splice(currentItemId, 1);
-            // console.log(removeItems);
-            // console.log(currentItemId);
+            const currentItemId = data.findIndex(todoItem => todoItem.itemId === itemId);
+            data.splice(currentItemId, 1);
             localStorage.setItem(this.formId, JSON.stringify(data));
             const todoItemContainer = this.findParentElByClass(target, 'taskWrapper');
             todoItemContainer.parentElement.remove();
@@ -104,7 +98,7 @@
 
         isEmptyValues(inputs) {
             let flag = inputs.some(input => !input.value.trim());
-            flag ? alert('Plaese, fill both inputs') : false;
+            flag ? alert('Please, fill both inputs') : false;
             return flag;
         },
 
